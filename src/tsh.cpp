@@ -13,16 +13,13 @@ void simple_shell::parse_command(char* cmd, char** cmdTokens) {
 void simple_shell::exec_command(char **argv) {
   // TODO: fork a child process to execute the command.
   // parent process should wait for the child process to complete and reap it
-	if(argv != NULL) {
-		pid_t pid = fork();
-		if(pid == 0) {
-			printf("EXECUTING: %s\n", *argv);
-			system(*argv);
-			simple_shell::exec_command(++argv);
-			waitpid(pid, NULL, 0);
-		}
-		else if(pid > 0) signal(SIGCHLD, SIG_IGN);
+	pid_t pid = fork();
+	if(pid == 0) {
+		if(argv + 1 != NULL) execvp(*argv, argv);
+		else system(*argv);
+		exit(0);
 	}
+	wait(NULL);
 }
 
 bool simple_shell::isQuit(char *cmd) {
